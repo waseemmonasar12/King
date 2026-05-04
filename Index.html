@@ -1,930 +1,137 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=no">
-  <title>متجر الملك للبرمجيات | أرقام وهمية • توثيق • شحن ألعاب</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=El+Messiri:wght@500;600;700&family=Markazi+Text:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    :root {
-      --bg-primary: #0b0c14;
-      --bg-secondary: #12162b;
-      --gold: #fbbf24;
-      --gold-light: #fcd34d;
-      --accent: #3b82f6;
-      --accent-light: #60a5fa;
-      --text: #e8e9f0;
-      --text-muted: #9ca3af;
-      --card-bg: rgba(18, 22, 40, 0.85);
-      --border: rgba(255, 255, 255, 0.12);
-      --glass: rgba(255, 255, 255, 0.03);
-      --shadow-gold: 0 0 25px rgba(251, 191, 36, 0.3);
-      --radius: 1.8rem;
-      --radius-sm: 1rem;
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر ملك البرمجيات | King Shop</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-    .light-mode {
-      --bg-primary: #f8fafc;
-      --bg-secondary: #ffffff;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --border: rgba(0, 0, 0, 0.1);
-      --glass: rgba(0, 0, 0, 0.02);
-    }
+    <style>
+        :root { --primary: #ffc107; --dark: #121212; --card: #1e1e1e; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        
+        /* لوحة التحكم */
+        .admin-panel { background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed var(--primary); }
+        input, select, button { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
+        button { background: var(--primary); cursor: pointer; font-weight: bold; }
+        button:hover { opacity: 0.8; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg-primary);
-      font-family: 'Cairo', sans-serif;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-      margin: 0;
-      position: relative;
-      overflow-x: hidden;
-      transition: background 0.5s, color 0.5s;
-    }
-
-    .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
-    .bg-animation .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite ease-in-out; }
-    .bg-animation .orb:nth-child(1) { width: 400px; height: 400px; background: #3b82f6; top: -10%; left: -15%; animation-delay: 0s; }
-    .bg-animation .orb:nth-child(2) { width: 350px; height: 350px; background: #8b5cf6; bottom: -15%; right: -10%; animation-delay: -7s; }
-    .bg-animation .orb:nth-child(3) { width: 250px; height: 250px; background: #fbbf24; top: 60%; left: 40%; animation-delay: -14s; }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(40px, -30px) scale(1.1); }
-      50% { transform: translate(-20px, 40px) scale(0.9); }
-      75% { transform: translate(-35px, -25px) scale(1.05); }
-    }
-
-    .main-container {
-      position: relative; z-index: 2; width: 100%; max-width: 900px;
-      background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(251,191,36,0.15) inset;
-      transition: all var(--transition);
-    }
-
-    .ticker-wrapper {
-      background: linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b);
-      border: 2px solid #6366f1; border-radius: 3rem; padding: 0.6rem 1rem; margin-bottom: 1.5rem;
-      overflow: hidden; position: relative;
-      box-shadow: 0 0 30px rgba(99,102,241,0.4), inset 0 0 15px rgba(255,255,255,0.05);
-    }
-
-    .light-mode .ticker-wrapper { background: linear-gradient(135deg, #e0e7ff, #c7d2fe, #e0e7ff); border-color: #818cf8; box-shadow: 0 0 25px rgba(99,102,241,0.25); }
-
-    .ticker-wrapper::before { content: "🔥"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 2; font-size: 1.2rem; animation: pulse 1.5s infinite; }
-    .ticker-wrapper::after { content: "✨"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 2; font-size: 1.2rem; animation: pulse 1.5s infinite 0.5s; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(0.8); }
-      50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
-    }
-
-    .ticker-content {
-      display: flex; animation: ticker 25s linear infinite; white-space: nowrap; gap: 3rem;
-      padding: 0 2rem; font-family: 'Markazi Text', 'Cairo', serif; font-size: 1.3rem; font-weight: 700; letter-spacing: 1px;
-    }
-
-    .ticker-content span { color: #fbbf24; display: inline-flex; align-items: center; gap: 0.5rem; text-shadow: 0 0 10px rgba(251,191,36,0.5); }
-    .light-mode .ticker-content span { color: #d97706; text-shadow: none; }
-
-    @keyframes ticker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    .ticker-content:hover { animation-play-state: paused; }
-
-    .logo-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 1.8rem; position: relative; }
-    .crown-wrapper { position: relative; display: inline-block; }
-
-    .crown-icon {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      font-size: 4rem; filter: drop-shadow(0 0 20px #fbbf2490); animation: crownGlow 3s infinite ease-in-out;
-    }
-
-    @keyframes crownGlow {
-      0%, 100% { filter: drop-shadow(0 0 20px #fbbf2490); }
-      50% { filter: drop-shadow(0 0 40px #fbbf24cc); }
-    }
-
-    .logo-text {
-      font-family: 'El Messiri', 'Cairo', sans-serif; font-size: 2.6rem; font-weight: 700;
-      background: linear-gradient(to left, #f7e05e, #fbbf24, #f59e0b, #d97706);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      letter-spacing: 2px; filter: drop-shadow(0 0 15px #ffb70370); line-height: 1.3;
-    }
-
-    .sub-logo {
-      color: var(--text-muted); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center;
-      gap: 0.7rem; background: var(--glass); padding: 0.5rem 1.8rem; border-radius: 3rem;
-      backdrop-filter: blur(5px); border: 1px solid var(--border); margin-top: 0.3rem;
-    }
-
-    .top-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem; }
-
-    .btn-icon {
-      background: var(--glass); border: 1px solid var(--border); color: var(--text);
-      padding: 0.5rem 1rem; border-radius: 2.5rem; font-weight: 700; font-size: 0.85rem;
-      cursor: pointer; backdrop-filter: blur(10px); transition: all var(--transition);
-      display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;
-    }
-
-    .btn-icon:hover { border-color: var(--gold); box-shadow: var(--shadow-gold); color: var(--gold); transform: translateY(-2px); }
-    .btn-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0b0c14 !important; border: none; font-weight: 800; }
-    .btn-gold:hover { box-shadow: 0 0 30px #fbbf2480; transform: scale(1.03); }
-
-    .cart-badge { background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
-
-    .admin-panel { background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border: 2px solid rgba(251,191,36,0.5); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.8rem; display: none; animation: fadeSlide 0.4s ease; }
-    .admin-panel.active { display: block; }
-
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .admin-panel h3 { color: var(--gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; }
-    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-    .admin-section { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; }
-    .admin-section h4 { color: var(--gold-light); margin-bottom: 0.8rem; font-size: 0.9rem; }
-
-    .input-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
-    .input-group label { min-width: 60px; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
-    .input-group input, .input-group select { background: #1e2338; border: 1px solid #334155; color: white; padding: 0.5rem 0.8rem; border-radius: 2rem; outline: none; font-family: 'Cairo'; font-size: 0.85rem; flex: 1; min-width: 100px; }
-    .light-mode .input-group input, .light-mode .input-group select { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
-
-    .btn-sm { background: #fbbf24; color: #0b0c14; border: none; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: var(--transition); font-family: 'Cairo'; }
-    .btn-sm:hover { background: #fcd34d; box-shadow: 0 0 15px #fbbf2480; }
-    .btn-danger { background: #ef4444; color: white; }
-    .btn-danger:hover { background: #dc2626; }
-    .btn-outline { background: transparent; border: 1px solid #fbbf24; color: #fbbf24; }
-
-    .offers-section { background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05)); border: 1px solid rgba(251,191,36,0.3); border-radius: var(--radius-sm); padding: 1rem 1.5rem; margin-bottom: 1.8rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between; backdrop-filter: blur(10px); }
-    .offer-badge { background: #ef4444; color: white; padding: 0.3rem 1rem; border-radius: 2rem; font-weight: 800; font-size: 0.8rem; animation: pulse 2s infinite; }
-    .offer-text { font-weight: 700; font-size: 1rem; color: var(--gold-light); }
-    .coupon-input-group { display: flex; gap: 0.5rem; }
-    .coupon-input-group input { background: #1e2338; border: 1px solid #fbbf24; color: white; padding: 0.5rem 1rem; border-radius: 2rem; outline: none; font-family: 'Cairo'; width: 130px; }
-
-    .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
-
-    .countries-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-
-    .country-card { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.2rem 0.8rem; text-align: center; backdrop-filter: blur(12px); transition: all var(--transition); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; position: relative; overflow: hidden; }
-    .country-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 15px 30px rgba(251,191,36,0.2); background: rgba(251,191,36,0.06); }
-    .country-card .delete-country-btn { position: absolute; top: 8px; left: 8px; background: rgba(239,68,68,0.8); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.6rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; }
-    .admin-mode .country-card .delete-country-btn { display: flex; }
-
-    .country-flag { font-size: 2.8rem; filter: drop-shadow(0 0 8px rgba(255,255,255,0.4)); }
-    .country-name { font-weight: 800; font-size: 1.05rem; }
-    .country-desc { font-size: 0.7rem; color: var(--text-muted); }
-    .country-price { background: rgba(251,191,36,0.12); padding: 0.3rem 1rem; border-radius: 2rem; color: var(--gold-light); font-weight: 800; font-size: 1.1rem; border: 1px solid rgba(251,191,36,0.3); }
-
-    .action-btns { display: flex; gap: 0.4rem; width: 100%; }
-    .buy-btn, .cart-add-btn { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 0.4rem 0.5rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.3rem; flex: 1; }
-    .buy-btn:hover, .cart-add-btn:hover { background: #2563eb; color: white; }
-
-    .contact-section { background: var(--glass); border-radius: var(--radius-sm); padding: 1.5rem; border: 1px solid var(--border); margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 600px) { .contact-section { grid-template-columns: 1fr; } }
-
-    .whatsapp-btn { background: #25D366; color: white; font-weight: 800; padding: 0.8rem 1.5rem; border-radius: 2.5rem; display: inline-flex; align-items: center; gap: 0.7rem; font-size: 1rem; text-decoration: none; transition: var(--transition); border: none; cursor: pointer; justify-content: center; }
-    .whatsapp-btn:hover { background: #1da851; box-shadow: 0 0 30px #25D36690; transform: scale(1.02); }
-
-    .message-box textarea { background: #1a1f33; border: 1px solid #334155; border-radius: var(--radius-sm); padding: 0.8rem; color: white; font-family: 'Cairo'; resize: vertical; outline: none; width: 100%; min-height: 80px; }
-    .phone-number-display { direction: ltr; font-weight: 800; font-size: 1.1rem; color: var(--gold-light); cursor: pointer; text-align: center; }
-    hr { border-color: var(--border); margin: 1.5rem 0; opacity: 0.5; }
-
-    .toast-msg { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fbbf24; padding: 0.8rem 2rem; border-radius: 3rem; font-weight: 700; z-index: 9999; box-shadow: 0 15px 30px rgba(0,0,0,0.6); border: 1px solid #fbbf24; animation: slideUp 0.3s ease; }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-
-    .footer-text { text-align: center; margin-top: 1.2rem; color: var(--text-muted); font-size: 0.8rem; }
-
-    /* ========== Google Gemini AI Chat ========== */
-    .ai-chat-trigger { position: fixed; bottom: 30px; right: 30px; z-index: 9999; width: 62px; height: 62px; background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 35px rgba(66,133,244,0.5); transition: all var(--transition); border: 2px solid rgba(255,255,255,0.3); animation: bounceAI 2s infinite; }
-    .ai-chat-trigger:hover { transform: scale(1.1); box-shadow: 0 15px 45px rgba(66,133,244,0.7); }
-    .ai-chat-trigger i { font-size: 1.8rem; color: white; }
-
-    @keyframes bounceAI {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .ai-chat-window { position: fixed; bottom: 100px; right: 30px; z-index: 9999; width: 400px; height: 550px; background: var(--card-bg); backdrop-filter: blur(30px); border: 2px solid rgba(66,133,244,0.4); border-radius: 1.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.7); display: none; flex-direction: column; overflow: hidden; animation: slideIn 0.3s ease; }
-    .ai-chat-window.open { display: flex; }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .ai-chat-header { background: linear-gradient(135deg, #4285F4, #34A853); padding: 1rem; display: flex; align-items: center; justify-content: space-between; color: white; font-weight: 800; }
-    .ai-chat-header .ai-model-badge { background: rgba(255,255,255,0.2); padding: 0.2rem 0.7rem; border-radius: 1rem; font-size: 0.7rem; display: flex; align-items: center; gap: 0.3rem; }
-    .ai-chat-header .close-chat { cursor: pointer; background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; font-size: 0.9rem; }
-
-    .ai-chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
-    .ai-message { max-width: 85%; padding: 0.7rem 1rem; border-radius: 1.2rem; font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
-    .ai-message.bot { background: rgba(66,133,244,0.2); border: 1px solid rgba(66,133,244,0.3); align-self: flex-start; color: var(--text); border-bottom-right-radius: 0.3rem; }
-    .ai-message.user { background: rgba(52,168,83,0.3); border: 1px solid rgba(52,168,83,0.4); align-self: flex-end; color: white; border-bottom-left-radius: 0.3rem; }
-
-    .ai-chat-input-area { padding: 0.8rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; }
-    .ai-chat-input-area input { flex: 1; background: #1e2338; border: 1px solid #334155; color: white; padding: 0.6rem 1rem; border-radius: 2rem; outline: none; font-family: 'Cairo'; }
-    .ai-chat-input-area button { background: linear-gradient(135deg, #4285F4, #34A853); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; }
-
-    .typing-indicator { display: flex; gap: 0.3rem; padding: 0.5rem 1rem; align-self: flex-start; }
-    .typing-indicator span { width: 8px; height: 8px; background: #4285F4; border-radius: 50%; animation: typing 1.4s infinite; }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes typing {
-      0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
-      30% { opacity: 1; transform: scale(1.2); }
-    }
-
-    .stats-bar { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .stat-item { background: var(--glass); border: 1px solid var(--border); border-radius: 2rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem; }
-    .stat-item i { color: var(--gold-light); }
-
-    @media (max-width: 450px) { .ai-chat-window { width: 95vw; right: 2.5vw; height: 65vh; bottom: 90px; } }
-  </style>
+        /* عرض المنتجات */
+        .country-card { background: var(--card); margin: 15px 0; padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .country-header { display: flex; justify-content: space-between; align-items: center; color: var(--primary); font-size: 1.2rem; font-weight: bold; }
+        .product-item { display: flex; justify-content: space-between; background: #252525; margin: 5px 0; padding: 10px; border-radius: 5px; }
+        .price { color: #4caf50; font-weight: bold; }
+        
+        .status-online { color: #4caf50; font-size: 0.8rem; text-align: center; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
 
-<div class="bg-animation"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div class="container">
+    <h1>👑 متجر ملك البرمجيات</h1>
+    <div id="connectionStatus" class="status-online">جاري الاتصال بالسحابة...</div>
 
-<div class="main-container" id="mainContainer">
-
-  <!-- ========== شريط الإعلانات المتحرك ========== -->
-  <div class="ticker-wrapper" id="tickerWrapper">
-    <div class="ticker-content" id="tickerContent">
-      <span>🎮 شحن ببجي بسعر خرافي</span>
-      <span>📱 أرقام وهمية لجميع الدول</span>
-      <span>✅ توثيق حسابات انستقرام وتويتر</span>
-      <span>📞 دعم فوري واتساب</span>
-      <span>💎 فرمتة جوالات باحترافية</span>
-      <span>🎁 كوبون خصم: <b>KING20</b></span>
+    <div class="admin-panel" id="adminPanel">
+        <h3>🛠 لوحة التحكم (للمالك فقط)</h3>
+        <input type="text" id="countryName" placeholder="اسم الدولة (مثلاً: بولندا)">
+        <input type="text" id="serviceName" placeholder="الخدمة (مثلاً: واتساب)">
+        <input type="number" id="price" placeholder="السعر">
+        <button onclick="addData()">إضافة/تحديث المنتج</button>
+        <p style="font-size: 0.8rem; color: #bbb;">* ملاحظة: أي تعديل هنا يظهر فوراً عند جميع الزبائن.</p>
     </div>
-  </div>
 
-  <!-- ========== الشعار ========== -->
-  <div class="logo-section">
-    <div class="crown-wrapper"><i class="fas fa-crown crown-icon"></i></div>
-    <div class="logo-text">ملك البرمجيات</div>
-    <div class="sub-logo"><i class="fas fa-shield-alt"></i> أرقام وهمية • توثيق • شحن ألعاب</div>
-  </div>
-
-  <!-- ========== شريط الإحصائيات ========== -->
-  <div class="stats-bar">
-    <div class="stat-item"><i class="fas fa-users"></i> الزوار: <b id="visitorCount">0</b></div>
-    <div class="stat-item"><i class="fas fa-eye"></i> اليوم: <b id="todayCount">0</b></div>
-    <div class="stat-item"><i class="fas fa-globe"></i> الدول: <b id="countryCount">0</b></div>
-  </div>
-
-  <!-- ========== أزرار التحكم العلوية ========== -->
-  <div class="top-actions">
-    <button class="btn-icon" id="toggleAdminPanelBtn"><i class="fas fa-user-shield"></i> لوحة المالك</button>
-    <button class="btn-icon" id="toggleThemeBtn"><i class="fas fa-moon"></i> <span id="themeLabel">وضع ليلي</span></button>
-    <button class="btn-icon" id="toggleCartPanelBtn"><i class="fas fa-shopping-cart"></i> السلة <span class="cart-badge" id="cartBadge" style="display:none;">0</span></button>
-    <button class="btn-icon btn-gold" id="editTickerBtn"><i class="fas fa-edit"></i> تعديل الإعلان</button>
-  </div>
-
-  <!-- ========== لوحة تحكم المالك ========== -->
-  <div class="admin-panel" id="adminPanel">
-    <h3><i class="fas fa-crown"></i> لوحة تحكم المالك</h3>
-    <div id="adminLoginArea">
-      <div class="input-group">
-        <label><i class="fas fa-key"></i> كلمة المرور</label>
-        <input type="password" id="adminPassword" placeholder="أدخل كلمة السر">
-        <button class="btn-sm" id="loginAdminBtn">دخول</button>
-      </div>
-    </div>
-    <div id="adminControls" style="display:none;">
-      <div class="admin-grid">
-        <div class="admin-section">
-          <h4>➕ إضافة دولة جديدة</h4>
-          <div class="input-group"><label>اسم الدولة</label><input type="text" id="newCountryName" placeholder="مثال: تركيا"></div>
-          <div class="input-group"><label>رمز العلم</label><input type="text" id="newCountryFlag" placeholder="🇹🇷"></div>
-          <div class="input-group"><label>السعر (ريال)</label><input type="number" id="newCountryPrice" placeholder="2000"></div>
-          <div class="input-group"><label>وصف مختصر</label><input type="text" id="newCountryDesc" placeholder="أرقام تركية"></div>
-          <button class="btn-sm" id="addCountryBtn"><i class="fas fa-plus"></i> إضافة الدولة</button>
-        </div>
-        <div class="admin-section">
-          <h4>📝 تعديل الإعلان المتحرك</h4>
-          <div class="input-group"><label>نص الإعلان</label><input type="text" id="tickerInput" placeholder="أدخل الإعلان مفصولاً بـ |"></div>
-          <button class="btn-sm" id="saveTickerBtn"><i class="fas fa-save"></i> حفظ الإعلان</button>
-          <small style="color:var(--text-muted);">افصل بين الإعلانات بعلامة |</small>
-        </div>
-        <div class="admin-section">
-          <h4>🎫 إدارة الكوبونات</h4>
-          <div class="input-group"><label>كود الخصم</label><input type="text" id="couponCode" placeholder="KING20"></div>
-          <div class="input-group"><label>نسبة الخصم %</label><input type="number" id="couponDiscount" placeholder="20"></div>
-          <button class="btn-sm" id="saveCouponBtn">حفظ الكوبون</button>
-          <button class="btn-sm btn-outline" id="deleteCouponBtn">حذف الكوبون</button>
-        </div>
-        <div class="admin-section">
-          <h4>🔑 مفتاح Gemini API</h4>
-          <div class="input-group"><label>المفتاح</label><input type="password" id="apiKeyInput" placeholder="AIzaSy..."></div>
-          <button class="btn-sm" id="saveApiKeyBtn">حفظ المفتاح</button>
-        </div>
-      </div>
-      <button class="btn-sm btn-danger" id="logoutAdminBtn" style="margin-top:1rem;"><i class="fas fa-sign-out-alt"></i> تسجيل خروج المالك</button>
-      <button class="btn-sm btn-outline" id="exportDataBtn" style="margin-top:1rem;"><i class="fas fa-download"></i> تصدير البيانات</button>
-      <button class="btn-sm btn-outline" id="resetAllBtn" style="margin-top:1rem;"><i class="fas fa-undo"></i> إعادة تعيين الموقع</button>
-    </div>
-  </div>
-
-  <!-- ========== قسم العروض والكوبونات ========== -->
-  <div class="offers-section" id="offersSection">
-    <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
-      <span class="offer-badge">🔥 عرض خاص</span>
-      <span class="offer-text">استخدم كود <b id="couponDisplayCode">KING20</b> لخصم <b id="couponDisplayPercent">20%</b></span>
-    </div>
-    <div class="coupon-input-group">
-      <input type="text" id="userCouponInput" placeholder="أدخل الكوبون">
-      <button class="btn-sm" id="applyCouponBtn">تطبيق</button>
-    </div>
-  </div>
-
-  <!-- ========== سلة المشتريات ========== -->
-  <div id="cartPanel" style="display:none; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1.2rem; margin-bottom:1.5rem;">
-    <h4 style="display:flex;justify-content:space-between;"><span><i class="fas fa-shopping-cart"></i> سلة المشتريات</span> <button class="btn-sm btn-danger" id="clearCartBtn">تفريغ</button></h4>
-    <div id="cartItems" style="max-height:200px;overflow-y:auto;margin:0.8rem 0;"></div>
-    <div style="font-weight:800;">الإجمالي: <span id="cartTotal">0</span> ريال <span id="cartDiscountLabel" style="color:#ef4444;display:none;">(بعد الخصم)</span></div>
-    <button class="btn-sm btn-gold" id="checkoutCartBtn" style="margin-top:0.5rem;width:100%;"><i class="fab fa-whatsapp"></i> إرسال الطلب واتساب</button>
-  </div>
-
-  <!-- ========== شبكة الدول ========== -->
-  <div class="section-title"><i class="fas fa-globe-americas"></i> الأرقام الوهمية المتاحة <span style="font-size:0.7rem;color:var(--text-muted);">(اضغط للشراء)</span></div>
-  <div class="countries-grid" id="countriesContainer"></div>
-
-  <hr>
-
-  <!-- ========== قسم التواصل ========== -->
-  <div class="contact-section">
-    <div style="display:flex;flex-direction:column;gap:1rem;align-items:center;">
-      <a class="whatsapp-btn" id="whatsappLink" href="https://wa.me/967775797251" target="_blank"><i class="fab fa-whatsapp fa-lg"></i> تواصل واتساب</a>
-      <div class="phone-number-display" id="phoneDisplay" title="اضغط للنسخ"><i class="fas fa-phone-alt"></i> +967 775797251</div>
-    </div>
-    <div class="message-box">
-      <textarea id="userMessage" rows="2" placeholder="أرسل رسالتك مباشرة..."></textarea>
-      <button class="btn-sm btn-gold" id="sendMessageBtn" style="width:100%;margin-top:0.5rem;"><i class="fas fa-paper-plane"></i> إرسال</button>
-    </div>
-  </div>
-
-  <div class="footer-text"><i class="far fa-clock"></i> سنوات من الخبرة في تقديم الأفضل • رضا الزمانك • متجر الملك للبرمجيات</div>
-</div>
-
-<!-- ========== Google Gemini AI Chat ========== -->
-<div class="ai-chat-trigger" id="aiChatTrigger" title="اسأل Gemini AI"><i class="fas fa-brain"></i></div>
-
-<div class="ai-chat-window" id="aiChatWindow">
-  <div class="ai-chat-header">
-    <span><i class="fas fa-robot"></i> Gemini AI <span class="ai-model-badge"><i class="fas fa-bolt"></i> gemini-2.0-flash</span></span>
-    <button class="close-chat" id="closeChatBtn"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="ai-chat-messages" id="aiChatMessages">
-    <div class="ai-message bot">
-👋 مرحباً! أنا مساعد <b>Gemini AI</b> من Google - مجاني تماماً في متجر ملك البرمجيات.
-
-يمكنني مساعدتك في:
-📱 الأرقام الوهمية والدول المتوفرة
-🎮 شحن الألعاب
-✅ توثيق الحسابات
-💰 الأسعار والخصومات
-📞 طرق التواصل
-💡 وأي أسئلة عامة أو تقنية أو علمية
-
-اسألني أي شيء!
-    </div>
-  </div>
-  <div class="ai-chat-input-area">
-    <input type="text" id="aiChatInput" placeholder="اسأل Gemini أي سؤال...">
-    <button id="aiSendBtn" title="إرسال"><i class="fas fa-paper-plane"></i></button>
-  </div>
+    <div id="shopContent"></div>
 </div>
 
 <script>
-  (function() {
-    // ========== الإعدادات ==========
-    const DEFAULT_COUNTRIES = [
-      { id: 'yemen', name: 'اليمن', flag: '🇾🇪', price: 3000, desc: 'أرقام يمنية موثوقة' },
-      { id: 'saudi', name: 'السعودية', flag: '🇸🇦', price: 3000, desc: 'أرقام سعودية أصلية' },
-      { id: 'usa', name: 'أمريكا', flag: '🇺🇸', price: 2500, desc: 'أرقام أمريكية سريعة' },
-      { id: 'uk', name: 'بريطانيا', flag: '🇬🇧', price: 2800, desc: 'أرقام بريطانية مميزة' },
-      { id: 'uae', name: 'الإمارات', flag: '🇦🇪', price: 3200, desc: 'أرقام إماراتية VIP' }
-    ];
+    // 1. إعدادات Firebase الخاصة بك
+    const firebaseConfig = {
+        apiKey: "AIzaSyAfnw3xes2mWLwW7efGS3qze4a-S9z6elo",
+        authDomain: "king-ffd5b.firebaseapp.com",
+        projectId: "king-ffd5b",
+        storageBucket: "king-ffd5b.firebasestorage.app",
+        messagingSenderId: "279124509483",
+        appId: "1:279124509483:web:f7679b3a5128c77c52bb6e",
+        measurementId: "G-4GP1XV60VD",
+        databaseURL: "https://king-ffd5b-default-rtdb.firebaseio.com" // رابط القاعدة
+    };
 
-    const DEFAULT_TICKER = "🎮 شحن ببجي بسعر خرافي | 📱 أرقام وهمية لجميع الدول | ✅ توثيق حسابات | 🔥 عروض يومية | 💎 فرمتة جوالات | 🎁 كوبون: KING20";
-    const DEFAULT_COUPON = { code: 'KING20', discount: 20 };
-    const ADMIN_PASSWORD = 'admin123';
-    const WHATSAPP_NUMBER = '967775797251';
-    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-    const MASTER_KEY = 'KING_MASTER_DATA_V3';
+    // 2. تشغيل Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // ========== نظام حماية مفتاح Gemini ==========
-    const KEY_STORAGE = 'king_gemini_key_enc';
-    const KEY_SALT = 'K1n9_Sh0p_G3m1n1_S@lt!2024';
+    // 3. جلب البيانات وعرضها (تحديث تلقائي)
+    db.ref('products').on('value', (snapshot) => {
+        document.getElementById('connectionStatus').innerText = "● متصل بالسحابة (تحديث فوري)";
+        const data = snapshot.val();
+        renderShop(data);
+    });
 
-    function encryptKey(key, salt) {
-      let encrypted = '';
-      for (let i = 0; i < key.length; i++) {
-        encrypted += String.fromCharCode(key.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
-      }
-      return btoa(encrypted);
-    }
+    // 4. وظيفة إضافة البيانات للسحابة
+    function addData() {
+        const country = document.getElementById('countryName').value;
+        const service = document.getElementById('serviceName').value;
+        const price = document.getElementById('price').value;
 
-    function decryptKey(encrypted, salt) {
-      try {
-        let decoded = atob(encrypted);
-        let key = '';
-        for (let i = 0; i < decoded.length; i++) {
-          key += String.fromCharCode(decoded.charCodeAt(i) ^ salt.charCodeAt(i % salt.length));
+        if(country && service && price) {
+            // حفظ البيانات في مسار: products/اسم_الدولة/اسم_الخدمة
+            db.ref('products/' + country + '/' + service).set({
+                price: price + " RY"
+            }).then(() => {
+                alert("تم التحديث بنجاح!");
+                document.getElementById('serviceName').value = "";
+                document.getElementById('price').value = "";
+            });
+        } else {
+            alert("يرجى ملء جميع الحقول");
         }
-        return key;
-      } catch(e) { return ''; }
     }
 
-    const DEFAULT_ENCRYPTED_KEY = (() => {
-      const raw = 'AIzaSyBRii33IcH70Ihh_yW_DVTIsDeo_JjJdj4';
-      return encryptKey(raw, KEY_SALT);
-    })();
+    // 5. رسم واجهة المتجر
+    function renderShop(data) {
+        const container = document.getElementById('shopContent');
+        container.innerHTML = "";
 
-    function getAPIKey() {
-      const stored = localStorage.getItem(KEY_STORAGE);
-      if (stored) {
-        const decrypted = decryptKey(stored, KEY_SALT);
-        if (decrypted && decrypted.startsWith('AIza')) return decrypted;
-      }
-      const defaultKey = decryptKey(DEFAULT_ENCRYPTED_KEY, KEY_SALT);
-      if (defaultKey && defaultKey.startsWith('AIza')) {
-        localStorage.setItem(KEY_STORAGE, DEFAULT_ENCRYPTED_KEY);
-        return defaultKey;
-      }
-      return '';
-    }
-
-    function setAPIKey(key) {
-      if (key && key.startsWith('AIza')) {
-        const encrypted = encryptKey(key, KEY_SALT);
-        localStorage.setItem(KEY_STORAGE, encrypted);
-        return true;
-      }
-      return false;
-    }
-
-    let GEMINI_API_KEY = getAPIKey();
-
-    // ========== نظام التحكم المركزي (جديد) ==========
-    function loadMasterData() {
-      const saved = localStorage.getItem(MASTER_KEY);
-      if (saved) {
-        try { return JSON.parse(saved); } catch(e) {}
-      }
-      const defaultData = { countries: DEFAULT_COUNTRIES, tickerText: DEFAULT_TICKER, activeCoupon: DEFAULT_COUPON };
-      localStorage.setItem(MASTER_KEY, JSON.stringify(defaultData));
-      return defaultData;
-    }
-
-    function saveMasterData(data) {
-      localStorage.setItem(MASTER_KEY, JSON.stringify(data));
-    }
-
-    let masterData = loadMasterData();
-    let countries = masterData.countries;
-    let tickerText = masterData.tickerText;
-    let activeCoupon = masterData.activeCoupon;
-    let cart = JSON.parse(localStorage.getItem('king_cart') || '[]');
-    let appliedCoupon = null;
-    let isAdminLoggedIn = sessionStorage.getItem('king_admin_logged') === 'true';
-    let conversationHistory = [];
-
-    // ========== عداد الزوار ==========
-    function updateStats() {
-      let total = parseInt(localStorage.getItem('king_total_visits') || '0');
-      let today = new Date().toDateString();
-      let daily = JSON.parse(localStorage.getItem('king_daily_visits') || '{"date":"","count":0}');
-      if (daily.date !== today) daily = { date: today, count: 0 };
-      total++; daily.count++;
-      localStorage.setItem('king_total_visits', total);
-      localStorage.setItem('king_daily_visits', JSON.stringify(daily));
-      document.getElementById('visitorCount').textContent = total.toLocaleString();
-      document.getElementById('todayCount').textContent = daily.count.toLocaleString();
-      document.getElementById('countryCount').textContent = countries.length;
-    }
-
-    // ========== تحديث الإعلان ==========
-    function updateTicker() {
-      const content = document.getElementById('tickerContent');
-      const items = tickerText.split('|').map(s => s.trim()).filter(s => s);
-      content.innerHTML = items.map(item => `<span>${item}</span>`).join('');
-      content.style.animation = 'none';
-      content.offsetHeight;
-      content.style.animation = 'ticker 25s linear infinite';
-    }
-
-    // ========== عرض الدول ==========
-    function renderCountries() {
-      const container = document.getElementById('countriesContainer');
-      container.innerHTML = '';
-      countries.forEach((country, index) => {
-        const finalPrice = appliedCoupon ? Math.round(country.price * (1 - appliedCoupon.discount / 100)) : country.price;
-        const card = document.createElement('div');
-        card.className = 'country-card';
-        card.innerHTML = `
-          <button class="delete-country-btn" data-index="${index}"><i class="fas fa-times"></i></button>
-          <div class="country-flag">${country.flag}</div>
-          <div class="country-name">${country.name}</div>
-          ${country.desc ? `<div class="country-desc">${country.desc}</div>` : ''}
-          <div class="country-price">${finalPrice} ريال ${appliedCoupon ? '<small style="text-decoration:line-through;color:#9ca3af;">'+country.price+'</small>' : ''}</div>
-          <div class="action-btns">
-            <button class="buy-btn" data-country="${country.name}" data-price="${finalPrice}" data-flag="${country.flag}">
-              <i class="fab fa-whatsapp"></i> شراء
-            </button>
-            <button class="cart-add-btn" data-index="${index}">
-              <i class="fas fa-cart-plus"></i>
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      document.querySelectorAll('.buy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const msg = `مرحباً متجر الملك، أريد رقم وهمي: ${this.dataset.flag} ${this.dataset.country} بسعر ${this.dataset.price} ريال`;
-          window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-        });
-      });
-
-      document.querySelectorAll('.cart-add-btn').forEach(btn => {
-        btn.addEventListener('click', function() { addToCart(parseInt(this.dataset.index)); });
-      });
-
-      document.querySelectorAll('.delete-country-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (!isAdminLoggedIn) return;
-          const idx = parseInt(this.dataset.index);
-          if (confirm(`حذف دولة: ${countries[idx].name}؟`)) {
-            countries.splice(idx, 1);
-            masterData.countries = countries;
-            saveMasterData(masterData);
-            renderCountries();
-            updateStats();
-            showToast('تم حذف الدولة');
-          }
-        });
-      });
-
-      const mainContainer = document.getElementById('mainContainer');
-      if (isAdminLoggedIn) mainContainer.classList.add('admin-mode');
-      else mainContainer.classList.remove('admin-mode');
-    }
-
-    // ========== السلة ==========
-    function addToCart(index) {
-      const country = countries[index];
-      const price = appliedCoupon ? Math.round(country.price * (1 - appliedCoupon.discount / 100)) : country.price;
-      cart.push({ ...country, price, addedAt: Date.now() });
-      localStorage.setItem('king_cart', JSON.stringify(cart));
-      updateCartUI();
-      showToast(`تمت إضافة ${country.flag} ${country.name} للسلة`);
-    }
-
-    function removeFromCart(cartIndex) { cart.splice(cartIndex, 1); localStorage.setItem('king_cart', JSON.stringify(cart)); updateCartUI(); }
-    function clearCart() { cart = []; localStorage.setItem('king_cart', JSON.stringify(cart)); updateCartUI(); showToast('تم تفريغ السلة'); }
-
-    function updateCartUI() {
-      const badge = document.getElementById('cartBadge');
-      const itemsDiv = document.getElementById('cartItems');
-      const totalSpan = document.getElementById('cartTotal');
-      const discountLabel = document.getElementById('cartDiscountLabel');
-      if (cart.length === 0) {
-        badge.style.display = 'none';
-        if (itemsDiv) itemsDiv.innerHTML = '<p style="color:var(--text-muted);">السلة فارغة</p>';
-        if (totalSpan) totalSpan.textContent = '0';
-        if (discountLabel) discountLabel.style.display = 'none';
-      } else {
-        badge.style.display = 'flex';
-        badge.textContent = cart.length;
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        if (itemsDiv) {
-          itemsDiv.innerHTML = cart.map((item, i) => `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border);">
-              <span>${item.flag} ${item.name} - ${item.price} ريال</span>
-              <button class="btn-sm btn-danger" style="padding:0.2rem 0.6rem;" data-cart-index="${i}"><i class="fas fa-trash"></i></button>
-            </div>
-          `).join('');
-          itemsDiv.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', () => removeFromCart(parseInt(btn.dataset.cartIndex)));
-          });
-        }
-        if (totalSpan) totalSpan.textContent = total;
-        if (discountLabel) discountLabel.style.display = appliedCoupon ? 'inline' : 'none';
-      }
-    }
-
-    function checkoutCart() {
-      if (cart.length === 0) return showToast('السلة فارغة');
-      let msg = 'طلب من متجر الملك:\n';
-      cart.forEach(item => { msg += `- ${item.flag} ${item.name}: ${item.price} ريال\n`; });
-      msg += `\nالإجمالي: ${cart.reduce((s,i)=>s+i.price,0)} ريال`;
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function updateOfferDisplay() {
-      document.getElementById('couponDisplayCode').textContent = activeCoupon.code;
-      document.getElementById('couponDisplayPercent').textContent = activeCoupon.discount + '%';
-    }
-
-    function applyUserCoupon(code) {
-      if (code.toUpperCase() === activeCoupon.code.toUpperCase()) {
-        appliedCoupon = { ...activeCoupon };
-        showToast(`تم تطبيق خصم ${activeCoupon.discount}%!`);
-        renderCountries();
-        updateCartPrices();
-      } else { showToast('كوبون غير صالح'); }
-    }
-
-    function updateCartPrices() {
-      cart = cart.map(item => {
-        const original = countries.find(c => c.id === item.id);
-        const basePrice = original ? original.price : item.price;
-        const newPrice = appliedCoupon ? Math.round(basePrice * (1 - appliedCoupon.discount / 100)) : basePrice;
-        return { ...item, price: newPrice };
-      });
-      localStorage.setItem('king_cart', JSON.stringify(cart));
-      updateCartUI();
-    }
-
-    function updateAdminUI() {
-      const loginArea = document.getElementById('adminLoginArea');
-      const controls = document.getElementById('adminControls');
-      if (isAdminLoggedIn) {
-        if (loginArea) loginArea.style.display = 'none';
-        if (controls) controls.style.display = 'block';
-        document.getElementById('tickerInput').value = tickerText;
-        document.getElementById('couponCode').value = activeCoupon.code;
-        document.getElementById('couponDiscount').value = activeCoupon.discount;
-        document.getElementById('apiKeyInput').value = GEMINI_API_KEY;
-      } else {
-        if (loginArea) loginArea.style.display = 'block';
-        if (controls) controls.style.display = 'none';
-      }
-      renderCountries();
-    }
-
-    function showToast(msg) {
-      const existing = document.querySelector('.toast-msg');
-      if (existing) existing.remove();
-      const toast = document.createElement('div');
-      toast.className = 'toast-msg';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
-    // ========== Google Gemini AI ==========
-    async function callGeminiAPI(userMessage) {
-      if (!GEMINI_API_KEY || !GEMINI_API_KEY.startsWith('AIza')) {
-        return '⚠️ لم يتم تعيين مفتاح Gemini API. يمكنك إضافته من لوحة تحكم المالك.';
-      }
-
-      const systemPrompt = `أنت مساعد ذكي لمتجر "ملك البرمجيات". الخدمات: أرقام وهمية، توثيق حسابات، شحن ألعاب، فرمتة جوالات، فك حظر، زيادة متابعين. الدول والأسعار: ${countries.map(c => `${c.flag} ${c.name}: ${c.price} ريال`).join('، ')}. واتساب: +${WHATSAPP_NUMBER}. أجب بالعربية. كن ودوداً ومفيداً.`;
-
-      const messages = [{ role: 'user', parts: [{ text: systemPrompt + '\n\nسؤال المستخدم: ' + userMessage }] }];
-
-      const recentHistory = conversationHistory.slice(-6);
-      if (recentHistory.length > 0) {
-        const historyMessages = recentHistory.map(h => ({
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.content }]
-        }));
-        messages.unshift(...historyMessages);
-      }
-
-      try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: messages, generationConfig: { temperature: 0.7, maxOutputTokens: 800, topP: 0.95 } })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          if (response.status === 429) return '⏳ تم الوصول للحد اليومي (1500 طلب). يعاد التعيين منتصف الليل. جرب لاحقاً.';
-          if (response.status === 403) return '🔑 المفتاح غير صالح أو منتهي الصلاحية.';
-          throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+        if (!data) {
+            container.innerHTML = "<p style='text-align:center;'>المتجر فارغ حالياً...</p>";
+            return;
         }
 
-        const data = await response.json();
-        if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          return data.candidates[0].content.parts[0].text;
+        for (let country in data) {
+            let countryHtml = `
+                <div class="country-card">
+                    <div class="country-header">
+                        <span>📍 ${country}</span>
+                        <button onclick="deleteCountry('${country}')" style="background:red; font-size:10px;">حذف</button>
+                    </div>
+            `;
+            
+            for (let service in data[country]) {
+                countryHtml += `
+                    <div class="product-item">
+                        <span>${service}</span>
+                        <span class="price">${data[country][service].price}</span>
+                    </div>
+                `;
+            }
+            
+            countryHtml += `</div>`;
+            container.innerHTML += countryHtml;
         }
-        throw new Error('No response from Gemini');
-      } catch (error) {
-        console.error('Gemini API Error:', error);
-        return '⚠️ عذراً، حدث خطأ في الاتصال. حاول مرة أخرى لاحقاً.';
-      }
     }
 
-    // ========== واجهة المحادثة ==========
-    const chatTrigger = document.getElementById('aiChatTrigger');
-    const chatWindow = document.getElementById('aiChatWindow');
-    const closeChatBtn = document.getElementById('closeChatBtn');
-    const aiSendBtn = document.getElementById('aiSendBtn');
-    const aiChatInput = document.getElementById('aiChatInput');
-    const aiChatMessages = document.getElementById('aiChatMessages');
-
-    chatTrigger.addEventListener('click', () => { chatWindow.classList.toggle('open'); if (chatWindow.classList.contains('open')) aiChatInput.focus(); });
-    closeChatBtn.addEventListener('click', () => chatWindow.classList.remove('open'));
-
-    function addAIMessage(text, type) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `ai-message ${type}`;
-      msgDiv.textContent = text;
-      aiChatMessages.appendChild(msgDiv);
-      aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    // وظيفة حذف دولة كاملة
+    function deleteCountry(name) {
+        if(confirm("هل تريد حذف " + name + " نهائياً؟")) {
+            db.ref('products/' + name).remove();
+        }
     }
-
-    function showTypingIndicator() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'typing-indicator';
-      typingDiv.id = 'typingIndicator';
-      typingDiv.innerHTML = '<span></span><span></span><span></span>';
-      aiChatMessages.appendChild(typingDiv);
-      aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-    }
-
-    function removeTypingIndicator() {
-      const indicator = document.getElementById('typingIndicator');
-      if (indicator) indicator.remove();
-    }
-
-    async function sendAIMessage() {
-      const userMessage = aiChatInput.value.trim();
-      if (!userMessage) return;
-      addAIMessage(userMessage, 'user');
-      conversationHistory.push({ role: 'user', content: userMessage });
-      aiChatInput.value = '';
-      showTypingIndicator();
-      try {
-        const response = await callGeminiAPI(userMessage);
-        removeTypingIndicator();
-        addAIMessage(response, 'bot');
-        conversationHistory.push({ role: 'assistant', content: response });
-        if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
-      } catch (error) {
-        removeTypingIndicator();
-        addAIMessage('⚠️ عذراً، حدث خطأ. حاول مرة أخرى.', 'bot');
-      }
-    }
-
-    aiSendBtn.addEventListener('click', sendAIMessage);
-    aiChatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendAIMessage(); });
-
-    // ========== أحداث UI ==========
-    document.getElementById('toggleAdminPanelBtn').addEventListener('click', () => { document.getElementById('adminPanel').classList.toggle('active'); updateAdminUI(); });
-
-    document.getElementById('loginAdminBtn').addEventListener('click', () => {
-      if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
-        isAdminLoggedIn = true;
-        sessionStorage.setItem('king_admin_logged', 'true');
-        updateAdminUI();
-        showToast('مرحباً بالمالك 👑');
-      } else { alert('كلمة مرور خاطئة'); }
-    });
-
-    document.getElementById('logoutAdminBtn').addEventListener('click', () => {
-      isAdminLoggedIn = false;
-      sessionStorage.removeItem('king_admin_logged');
-      updateAdminUI();
-      showToast('تم تسجيل الخروج');
-    });
-
-    document.getElementById('addCountryBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      const name = document.getElementById('newCountryName').value.trim();
-      const flag = document.getElementById('newCountryFlag').value.trim();
-      const price = parseInt(document.getElementById('newCountryPrice').value) || 2000;
-      const desc = document.getElementById('newCountryDesc').value.trim();
-      if (!name || !flag) return alert('أدخل اسم الدولة والعلم');
-      countries.push({ id: 'custom_' + Date.now(), name, flag, price, desc });
-      masterData.countries = countries;
-      saveMasterData(masterData);
-      renderCountries();
-      updateStats();
-      ['newCountryName','newCountryFlag','newCountryPrice','newCountryDesc'].forEach(id => document.getElementById(id).value = '');
-      showToast(`تمت إضافة ${flag} ${name}`);
-    });
-
-    document.getElementById('saveTickerBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      tickerText = document.getElementById('tickerInput').value.trim() || DEFAULT_TICKER;
-      masterData.tickerText = tickerText;
-      saveMasterData(masterData);
-      updateTicker();
-      showToast('تم تحديث الإعلان');
-    });
-
-    document.getElementById('saveCouponBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      activeCoupon = { code: document.getElementById('couponCode').value.trim().toUpperCase(), discount: parseInt(document.getElementById('couponDiscount').value) || 20 };
-      masterData.activeCoupon = activeCoupon;
-      saveMasterData(masterData);
-      updateOfferDisplay();
-      showToast('تم حفظ الكوبون');
-    });
-
-    document.getElementById('deleteCouponBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      activeCoupon = { code: 'KING20', discount: 20 };
-      masterData.activeCoupon = activeCoupon;
-      saveMasterData(masterData);
-      updateOfferDisplay();
-      showToast('تم إعادة الكوبون الافتراضي');
-    });
-
-    document.getElementById('saveApiKeyBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      const newKey = document.getElementById('apiKeyInput').value.trim();
-      if (newKey.startsWith('AIza')) { setAPIKey(newKey); GEMINI_API_KEY = newKey; conversationHistory = []; showToast('✅ تم حفظ مفتاح Gemini بنجاح'); }
-      else { alert('مفتاح غير صالح. يجب أن يبدأ بـ AIza'); }
-    });
-
-    document.getElementById('resetAllBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      if (confirm('⚠️ هل أنت متأكد من إعادة تعيين الموقع بالكامل؟ سترجع جميع البيانات للافتراضي.')) {
-        masterData = { countries: DEFAULT_COUNTRIES, tickerText: DEFAULT_TICKER, activeCoupon: DEFAULT_COUPON };
-        saveMasterData(masterData);
-        countries = masterData.countries;
-        tickerText = masterData.tickerText;
-        activeCoupon = masterData.activeCoupon;
-        renderCountries();
-        updateTicker();
-        updateOfferDisplay();
-        updateStats();
-        showToast('✅ تم إعادة تعيين الموقع بنجاح');
-      }
-    });
-
-    document.getElementById('applyCouponBtn').addEventListener('click', () => { const code = document.getElementById('userCouponInput').value.trim(); if (code) applyUserCoupon(code); });
-    document.getElementById('toggleCartPanelBtn').addEventListener('click', () => { const panel = document.getElementById('cartPanel'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; updateCartUI(); });
-    document.getElementById('clearCartBtn').addEventListener('click', clearCart);
-    document.getElementById('checkoutCartBtn').addEventListener('click', checkoutCart);
-
-    document.getElementById('sendMessageBtn').addEventListener('click', () => {
-      const msg = document.getElementById('userMessage').value.trim();
-      if (!msg) return alert('اكتب رسالة');
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-      document.getElementById('userMessage').value = '';
-    });
-
-    document.getElementById('phoneDisplay').addEventListener('click', () => { navigator.clipboard.writeText('+967775797251').then(() => showToast('تم نسخ الرقم 📋')); });
-
-    document.getElementById('editTickerBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) { document.getElementById('adminPanel').classList.add('active'); updateAdminUI(); showToast('سجل دخول المالك أولاً'); return; }
-      document.getElementById('adminPanel').classList.add('active'); updateAdminUI(); document.getElementById('tickerInput').focus();
-    });
-
-    document.getElementById('toggleThemeBtn').addEventListener('click', () => {
-      document.body.classList.toggle('light-mode');
-      const label = document.getElementById('themeLabel'), icon = document.querySelector('#toggleThemeBtn i');
-      if (document.body.classList.contains('light-mode')) { label.textContent = 'وضع نهاري'; icon.className = 'fas fa-sun'; }
-      else { label.textContent = 'وضع ليلي'; icon.className = 'fas fa-moon'; }
-    });
-
-    document.getElementById('exportDataBtn').addEventListener('click', () => {
-      if (!isAdminLoggedIn) return;
-      const blob = new Blob([JSON.stringify(masterData, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'king_shop_backup.json'; a.click();
-      showToast('تم تصدير البيانات');
-    });
-
-    // ========== تهيئة ==========
-    updateTicker();
-    updateOfferDisplay();
-    renderCountries();
-    updateCartUI();
-    updateAdminUI();
-    updateStats();
-    console.log('✅ متجر الملك للبرمجيات جاهز | Google Gemini AI مجاني | تحكم مركزي');
-  })();
 </script>
+
 </body>
 </html>
+
