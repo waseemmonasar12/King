@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -388,7 +387,7 @@
       font-size: 0.8rem;
     }
 
-    /* ========== DeepSeek AI Chat ========== */
+    /* ========== Gemini AI Chat ========== */
     .ai-chat-trigger {
       position: fixed;
       bottom: 30px;
@@ -396,13 +395,13 @@
       z-index: 9999;
       width: 62px;
       height: 62px;
-      background: linear-gradient(135deg, #4f46e5, #6366f1, #8b5cf6);
+      background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 10px 35px rgba(79, 70, 229, 0.5);
+      box-shadow: 0 10px 35px rgba(66, 133, 244, 0.5);
       transition: all var(--transition);
       border: 2px solid rgba(255, 255, 255, 0.3);
       animation: bounceAI 2s infinite;
@@ -410,7 +409,7 @@
 
     .ai-chat-trigger:hover {
       transform: scale(1.1);
-      box-shadow: 0 15px 45px rgba(99, 102, 241, 0.7);
+      box-shadow: 0 15px 45px rgba(66, 133, 244, 0.7);
     }
 
     .ai-chat-trigger i {
@@ -428,11 +427,11 @@
       bottom: 100px;
       right: 30px;
       z-index: 9999;
-      width: 390px;
-      height: 540px;
+      width: 400px;
+      height: 550px;
       background: var(--card-bg);
       backdrop-filter: blur(30px);
-      border: 2px solid rgba(99, 102, 241, 0.4);
+      border: 2px solid rgba(66, 133, 244, 0.4);
       border-radius: 1.5rem;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
       display: none;
@@ -449,7 +448,7 @@
     }
 
     .ai-chat-header {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      background: linear-gradient(135deg, #4285F4, #34A853);
       padding: 1rem;
       display: flex;
       align-items: center;
@@ -499,16 +498,16 @@
     }
 
     .ai-message.bot {
-      background: rgba(99, 102, 241, 0.2);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(66, 133, 244, 0.2);
+      border: 1px solid rgba(66, 133, 244, 0.3);
       align-self: flex-start;
       color: var(--text);
       border-bottom-right-radius: 0.3rem;
     }
 
     .ai-message.user {
-      background: rgba(59, 130, 246, 0.3);
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: rgba(52, 168, 83, 0.3);
+      border: 1px solid rgba(52, 168, 83, 0.4);
       align-self: flex-end;
       color: white;
       border-bottom-left-radius: 0.3rem;
@@ -533,7 +532,7 @@
     }
 
     .ai-chat-input-area button {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      background: linear-gradient(135deg, #4285F4, #34A853);
       color: white;
       border: none;
       width: 42px;
@@ -552,7 +551,7 @@
     .typing-indicator span {
       width: 8px;
       height: 8px;
-      background: #6366f1;
+      background: #4285F4;
       border-radius: 50%;
       animation: typing 1.4s infinite;
     }
@@ -675,22 +674,22 @@
   </div>
 </div>
 
-<!-- ========== DeepSeek AI Chat ========== -->
-<div class="ai-chat-trigger" id="aiChatTrigger" title="اسأل DeepSeek AI">
+<!-- ========== Google Gemini AI Chat ========== -->
+<div class="ai-chat-trigger" id="aiChatTrigger" title="اسأل Gemini AI">
   <i class="fas fa-brain"></i>
 </div>
 
 <div class="ai-chat-window" id="aiChatWindow">
   <div class="ai-chat-header">
     <span>
-      <i class="fas fa-robot"></i> DeepSeek AI
-      <span class="ai-model-badge"><i class="fas fa-bolt"></i> deepseek-chat</span>
+      <i class="fas fa-robot"></i> Gemini AI
+      <span class="ai-model-badge"><i class="fas fa-bolt"></i> gemini-2.0-flash</span>
     </span>
     <button class="close-chat" id="closeChatBtn"><i class="fas fa-times"></i></button>
   </div>
   <div class="ai-chat-messages" id="aiChatMessages">
     <div class="ai-message bot">
-👋 مرحباً! أنا مساعد <b>DeepSeek AI</b> في متجر ملك البرمجيات.
+👋 مرحباً! أنا مساعد <b>Gemini AI</b> من Google - مجاني تماماً في متجر ملك البرمجيات.
 
 يمكنني مساعدتك في:
 📱 الأرقام الوهمية والدول المتوفرة
@@ -698,23 +697,23 @@
 ✅ توثيق الحسابات
 💰 الأسعار والخصومات
 📞 طرق التواصل
-💡 وأي أسئلة عامة أو تقنية
+💡 وأي أسئلة عامة أو تقنية أو علمية
 
-كيف أقدر أخدمك؟
+اسألني أي شيء!
     </div>
   </div>
   <div class="ai-chat-input-area">
-    <input type="text" id="aiChatInput" placeholder="اسأل DeepSeek أي سؤال...">
+    <input type="text" id="aiChatInput" placeholder="اسأل Gemini أي سؤال...">
     <button id="aiSendBtn" title="إرسال"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
 
 <script>
   (function() {
-    // ========== CONFIGURATION ==========
-    const DEEPSEEK_API_KEY = 'sk-a7d111569fa74fa3b59d404f117c1a9c';
-    const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-    const DEEPSEEK_MODEL = 'deepseek-chat';
+    // ========== مفتاح Google Gemini API المجاني ==========
+    // هذا هو السطر الذي تبحث عنه - ضع المفتاح هنا ⬇️
+    const GEMINI_API_KEY = 'AIzaSyBRii33IcH70Ihh_yW_DVTIsDeo_JjJdj4';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     const WHATSAPP_NUMBER = '967775797251';
 
     // ========== المتجر ==========
@@ -723,7 +722,10 @@
       { id: 'saudi', name: 'السعودية', flag: '🇸🇦', price: 3000, desc: 'أرقام سعودية أصلية' },
       { id: 'usa', name: 'أمريكا', flag: '🇺🇸', price: 2500, desc: 'أرقام أمريكية سريعة' },
       { id: 'uk', name: 'بريطانيا', flag: '🇬🇧', price: 2800, desc: 'أرقام بريطانية مميزة' },
-      { id: 'uae', name: 'الإمارات', flag: '🇦🇪', price: 3200, desc: 'أرقام إماراتية VIP' }
+      { id: 'uae', name: 'الإمارات', flag: '🇦🇪', price: 3200, desc: 'أرقام إماراتية VIP' },
+      { id: 'turkey', name: 'تركيا', flag: '🇹🇷', price: 2000, desc: 'أرقام تركية' },
+      { id: 'egypt', name: 'مصر', flag: '🇪🇬', price: 1500, desc: 'أرقام مصرية' },
+      { id: 'france', name: 'فرنسا', flag: '🇫🇷', price: 3500, desc: 'أرقام فرنسية' }
     ];
 
     const DEFAULT_COUPON = { code: 'KING20', discount: 20 };
@@ -839,8 +841,8 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
-    // ========== DeepSeek AI ==========
-    async function callDeepSeekAPI(userMessage) {
+    // ========== Google Gemini AI (مجاني 1500 طلب/يوم) ==========
+    async function callGeminiAPI(userMessage) {
       const systemPrompt = `أنت مساعد ذكي لمتجر "ملك البرمجيات". المتجر يقدم خدمات:
 - بيع أرقام وهمية عربية وأجنبية
 - توثيق حسابات التواصل الاجتماعي
@@ -852,41 +854,58 @@
 الدول المتوفرة حالياً:
 ${countries.map(c => `${c.flag} ${c.name}: ${c.price} ريال - ${c.desc}`).join('\n')}
 
-الكوبون الحالي: ${activeCoupon.code} خصم ${activeCoupon.discount}%
-رقم الواتساب: +${WHATSAPP_NUMBER}
+الكوبون: ${activeCoupon.code} خصم ${activeCoupon.discount}%
+واتساب: +${WHATSAPP_NUMBER}
 
-الأسعار بالريال اليمني. كن ودوداً ومفيداً. أجب بالعربية. قدم إجابات قصيرة ومفيدة.`;
+أجب بالعربية. كن ودوداً ومفيداً.`;
+
+      const messages = [
+        { role: 'user', parts: [{ text: systemPrompt + '\n\nسؤال المستخدم: ' + userMessage }] }
+      ];
+
+      // إضافة آخر 6 رسائل من المحادثة
+      const recentHistory = conversationHistory.slice(-6);
+      if (recentHistory.length > 0) {
+        const historyMessages = recentHistory.map(h => ({
+          role: h.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: h.content }]
+        }));
+        messages.unshift(...historyMessages);
+      }
 
       try {
-        const response = await fetch(DEEPSEEK_API_URL, {
+        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: DEEPSEEK_MODEL,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...conversationHistory.slice(-10),
-              { role: 'user', content: userMessage }
-            ],
-            temperature: 0.7,
-            max_tokens: 800
+            contents: messages,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 800,
+              topP: 0.95
+            }
           })
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          console.error('DeepSeek API Error:', errorData);
+          if (response.status === 429) {
+            return '⏳ تم الوصول للحد اليومي (1500 طلب). يعاد التعيين منتصف الليل. جرب لاحقاً.';
+          }
+          if (response.status === 403) {
+            return '🔑 المفتاح غير صالح أو منتهي الصلاحية.';
+          }
           throw new Error(errorData.error?.message || `HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        return data.choices[0].message.content;
+        if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
+        throw new Error('No response from Gemini');
       } catch (error) {
-        console.error('DeepSeek API Error:', error);
-        return '⚠️ عذراً، حدث خطأ في الاتصال بـ DeepSeek. حاول مرة أخرى لاحقاً.';
+        console.error('Gemini API Error:', error);
+        return '⚠️ عذراً، حدث خطأ في الاتصال. حاول مرة أخرى لاحقاً.';
       }
     }
 
@@ -937,10 +956,11 @@ ${countries.map(c => `${c.flag} ${c.name}: ${c.price} ريال - ${c.desc}`).joi
       showTypingIndicator();
 
       try {
-        const response = await callDeepSeekAPI(userMessage);
+        const response = await callGeminiAPI(userMessage);
         removeTypingIndicator();
         addAIMessage(response, 'bot');
         conversationHistory.push({ role: 'assistant', content: response });
+        if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
       } catch (error) {
         removeTypingIndicator();
         addAIMessage('⚠️ عذراً، حدث خطأ. حاول مرة أخرى.', 'bot');
@@ -1016,7 +1036,7 @@ ${countries.map(c => `${c.flag} ${c.name}: ${c.price} ريال - ${c.desc}`).joi
     updateCartUI();
     updateStats();
 
-    console.log('✅ متجر الملك للبرمجيات جاهز | DeepSeek AI مفعل');
+    console.log('✅ متجر الملك للبرمجيات جاهز | Google Gemini AI مجاني (1500 طلب/يوم)');
   })();
 </script>
 </body>
